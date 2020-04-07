@@ -10,22 +10,33 @@ public class Main {
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
-		String enter = "";
 		Usuari user;
 		List<Usuari> usuaris = new ArrayList<Usuari>();
-		
+				
+		//usuaris inicialitzats de prova
 		Date d1 = new Date(2323223232L);
-		
-		Usuari u1 = new Usuari ("Eloi", "Fernandez", "hola", d1);
+		Usuari u1 = new Usuari ("eloi", "Fernandez", "hola", d1);
 		usuaris.add(u1);
+		List<String> tgs = new ArrayList<String>();
+		tgs.add("tag1");
+		tgs.add("tag2");
+		List<Video> videosU1 = new ArrayList<Video> ();
+		Video v1 = new Video ("www.google.es", "videoooo1", tgs);
+		Video v2 = new Video ("www.google.es", "videoooo2", tgs);		
+		videosU1.add(v1);
+		videosU1.add(v2);
+		u1.setVideos(videosU1);
 		
-		user = welcome(enter, usuaris, sc);
+		//reg/log
+		user = welcome(usuaris, sc);
 		
-		userHome(user, sc);
+		//crear/mostrar videos
+		userHome(user,sc);
 		
 	}
 
-	private static Usuari welcome(String enter, List<Usuari> u, Scanner sc) {
+	private static Usuari welcome(List<Usuari> u, Scanner sc) {
+		String enter;
 		Usuari user = new Usuari();
 		System.out.println("Benvingut! Escriu si vols Login o Registrar");
 		enter = sc.next();
@@ -43,13 +54,20 @@ public class Main {
 
 	private static void userHome(Usuari u, Scanner sc) {
 		String action;
-		System.out.println("Què vols fer, crear nou video (crear) o veure el teu llistat de videos (llistat)?");
-		action = sc.next();
-		if (action.equals("crear")) {
-			createVideo(u);
-		} else if(action.equals("llistat")) {		
-			listVideo(u);
-		}		
+		boolean isLog = true;
+		do {
+			System.out.println("Què vols fer, crear nou video (crear), veure llistat de videos (llistat) o tanca sessió (close)?");
+			action = sc.next();
+			if (action.equals("crear")) {
+				createVideo(u);
+			} else if(action.equals("llistat")) {		
+				listVideo(u);
+			} else if(action.equals("close")) {		
+				isLog = false;
+				System.out.println("Fins aviat!");
+			}	
+		}while (isLog);
+			
 	}
 
 	private static Usuari login(List<Usuari> usuaris, Scanner sc) {
@@ -102,5 +120,41 @@ public class Main {
 		System.out.println("Benvingut a la plataforma, " + user.getNom() + " " + user.getCognom());
 		
 		return user;
+	}
+
+	private static void listVideo(Usuari u) {
+		List <Video> videosU = u.getVideos();
+		
+		for (int i = 0; i < videosU.size(); i++) {
+			String titol = videosU.get(i).getTitol();
+			System.out.println(titol);
+		}
+		
+	}
+	
+	private static void createVideo(Usuari u) {
+		Scanner sc1 = new Scanner(System.in);
+		String url, ttl;
+		List<Video> vs = u.getVideos();
+		Video v1;
+		int nTgs = 0;
+		List<String> tgsU = new ArrayList<String>();
+		
+		System.out.println("Escriu l'URL del nou video");
+		url = sc1.next();
+		System.out.println("Escriu el nom del nou video");
+		ttl = sc1.next();
+		System.out.println("Quants tags vols posar?");
+		nTgs = sc1.nextInt();
+		
+		for (int i = 1; i <= nTgs; i++) {
+			System.out.println("Tag nº" + i);
+			tgsU.add(sc1.next());
+		}
+		
+		v1 = new Video (url, ttl, tgsU);
+		vs.add(v1);
+		
+		
 	}
 }
