@@ -9,8 +9,7 @@ import java.util.Scanner;
 public class Main {
 
 	public static void main(String[] args) {
-		Scanner sc = new Scanner(System.in);
-		Usuari user;
+		Usuari user = new Usuari();
 		List<Usuari> usuaris = new ArrayList<Usuari>();
 				
 		//usuaris inicialitzats de prova
@@ -28,36 +27,54 @@ public class Main {
 		u1.setVideos(videosU1);
 		
 		//reg/log
-		user = welcome(usuaris, sc);
+		try {
+			user = welcome(usuaris);
+		} catch (NoDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//crear/mostrar videos
-		userHome(user,sc);
+		try {
+			userHome(user);
+		} catch (NoDataException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
-	private static Usuari welcome(List<Usuari> u, Scanner sc) {
+	private static Usuari welcome(List<Usuari> u) throws NoDataException {
 		String enter;
 		Usuari user = new Usuari();
-		System.out.println("Benvingut! Escriu si vols Login o Registrar");
-		enter = sc.next();
+		boolean isLogOrReg = false;
 		
-		if (enter.contains("log") || enter.contains("Log")) {
+		do {
+			System.out.println("Benvingut! Escriu si vols Login o Registrar");
+			enter = stringScanner();
 			
-			user = login(u, sc);
-		} else if (enter.contains("Reg") || enter.contains("reg")) {
-			user = newUser(sc);
-			u.add(user);
-		}	
+			if (enter.equals("login") || enter.equals("Login")) {
+				user = login(u);
+				isLogOrReg = true;
+			} else if (enter.equals("Registrar") || enter.equals("registrar")) {
+				user = newUser();
+				u.add(user);
+				isLogOrReg = true;
+			} else {
+				System.out.println("no t'he entès!");
+				isLogOrReg = false;
+			}
+		}while (!isLogOrReg);
 		
 		return user; 
 	}
 
-	private static void userHome(Usuari u, Scanner sc) {
+	private static void userHome(Usuari u) throws NoDataException {
 		String action;
 		boolean isLog = true;
 		do {
 			System.out.println("Què vols fer, crear nou video (crear), veure llistat de videos (llistat) o tanca sessió (close)?");
-			action = sc.next();
+			action = stringScanner();
 			if (action.equals("crear")) {
 				createVideo(u);
 			} else if(action.equals("llistat")) {		
@@ -70,7 +87,7 @@ public class Main {
 			
 	}
 
-	private static Usuari login(List<Usuari> usuaris, Scanner sc) {
+	private static Usuari login(List<Usuari> usuaris) throws NoDataException {
 		String name, pass;
 		Usuari userIntro;
 		Usuari userFound = new Usuari();
@@ -78,9 +95,9 @@ public class Main {
 		
 		do {
 			System.out.println("Introdueix el teu nom");
-			name = sc.next();
+			name = stringScanner();
 			System.out.println("Introdueix la contrasenya");
-			pass = sc.next();
+			pass = stringScanner();
 			userIntro  = new Usuari(name, pass);
 			
 			for (int i = 0; i<usuaris.size(); i++) {
@@ -104,17 +121,17 @@ public class Main {
 		return userFound;
 	}
 
-	private static Usuari newUser(Scanner sc) {
+	private static Usuari newUser() throws NoDataException {
 		String name, surname, pass;
 		Date dataR = new Date();
 		Usuari user;
 		
 		System.out.println("Introdueix el nom: ");
-		name = sc.next();
+		name = stringScanner();
 		System.out.println("Introdueix el cognom: ");
-		surname = sc.next();
+		surname = stringScanner();
 		System.out.println("Introdueix la contrasenya: ");
-		pass = sc.next();
+		pass = stringScanner();
 		user = new Usuari(name, surname, pass, dataR);
 		
 		System.out.println("Benvingut a la plataforma, " + user.getNom() + " " + user.getCognom());
@@ -132,8 +149,7 @@ public class Main {
 		
 	}
 	
-	private static void createVideo(Usuari u) {
-		Scanner sc1 = new Scanner(System.in);
+	private static void createVideo(Usuari u) throws NoDataException {
 		String url, ttl;
 		List<Video> vs = u.getVideos();
 		Video v1;
@@ -141,20 +157,42 @@ public class Main {
 		List<String> tgsU = new ArrayList<String>();
 		
 		System.out.println("Escriu l'URL del nou video");
-		url = sc1.next();
+		url = stringScanner();
 		System.out.println("Escriu el nom del nou video");
-		ttl = sc1.next();
+		ttl = stringScanner();
 		System.out.println("Quants tags vols posar?");
-		nTgs = sc1.nextInt();
+		nTgs = intScanner();
 		
 		for (int i = 1; i <= nTgs; i++) {
 			System.out.println("Tag nº" + i);
-			tgsU.add(sc1.next());
+			try {
+				tgsU.add(stringScanner());
+			} catch (NoDataException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		v1 = new Video (url, ttl, tgsU);
-		vs.add(v1);
+		vs.add(v1);		
+	}
+	
+	private static String stringScanner() throws NoDataException {
+		String txt;
+		Scanner sc = new Scanner(System.in);
 		
+		txt = sc.next();
+		if(txt.equals(" ")) {
+			throw new NoDataException();
+		}
+		return txt;
+	}
+	
+	private static int intScanner() throws NoDataException{
+		int num;
+		Scanner sc = new Scanner(System.in);
 		
+		num = sc.nextInt();
+		return num;
 	}
 }
